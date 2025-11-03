@@ -1,0 +1,86 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "substack-scraper"
+version = "2.0.0"
+description = "A robust web scraper for extracting article URLs from Substack archive pages"
+readme = "README.md"
+authors = [
+    {name = "Substack Scraper Contributors"}
+]
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "selenium>=4.16.0",
+    "webdriver-manager>=4.0.1",
+    "beautifulsoup4>=4.12.2",
+    "tqdm>=4.66.1",
+    "requests>=2.31.0",
+    "pyyaml>=6.0.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.3",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.12.0",
+    "black>=23.12.1",
+    "flake8>=7.0.0",
+    "mypy>=1.8.0",
+]
+
+[project.scripts]
+substack-scraper = "substack_scraper.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/yourusername/substack-scraper"
+Repository = "https://github.com/yourusername/substack-scraper"
+"Bug Tracker" = "https://github.com/yourusername/substack-scraper/issues"
+
+[tool.black]
+line-length = 127
+target-version = ['py38', 'py39', 'py310', 'py311']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | \.tox
+  | build
+  | dist
+  | __pycache__
+)/
+'''
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.coverage.run]
+source = ["src/substack_scraper"]
+omit = ["tests/*", "*/test_*.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]

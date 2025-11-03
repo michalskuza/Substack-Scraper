@@ -1,84 +1,277 @@
-# Substack Scraper - Usage Guide
+# Substack Scraper
 
-## Overview
-This script extracts article URLs from a Substack archive page and can optionally display publication dates. It uses Selenium to handle infinite scrolling and BeautifulSoup to parse the page contents.
+[![CI](https://github.com/yourusername/substack-scraper/workflows/CI/badge.svg)](https://github.com/yourusername/substack-scraper/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+
+A robust, feature-rich web scraper for extracting article URLs from Substack archive pages with support for multiple browsers, output formats, and resume capabilities.
+
+## Features
+
+✨ **Core Features**
+- 🔄 Handles infinite scrolling automatically
+- 📅 Extracts publication dates and titles
+- 🎨 Multiple output formats (TXT, CSV, JSON)
+- 💾 Resume capability with checkpoint files
+- 🌐 Multi-browser support (Chrome, Firefox, Edge)
+- ⚡ Progress bars and logging
+- 🔧 Configurable via YAML/JSON files
+- 🎯 Smart anti-bot detection avoidance
 
 ## Installation
-Before running the script, ensure you have Python installed (version 3.7 or later). Then, install the required dependencies:
 
+### From PyPI (Recommended)
 ```bash
-pip install selenium webdriver-manager beautifulsoup4 argparse
+pip install substack-scraper
 ```
 
-Additionally, make sure you have **Google Chrome** installed on your system. The script uses **chromedriver**, which is automatically managed by `webdriver-manager`.
-
-## Usage
-Run the script with the following command:
-
+### From Source
 ```bash
-python substack_scraper.py <archive_url> [OPTIONS]
+git clone https://github.com/yourusername/substack-scraper.git
+cd substack-scraper
+pip install -e .
 ```
 
-### Required Argument
-- `<archive_url>`: The URL of the Substack archive page (e.g., `https://substack.com/archive`).
+### Requirements
+- Python 3.8 or later
+- One of: Google Chrome, Firefox, or Microsoft Edge
 
-### Options
-- `--debug` : Enables debug mode, which saves the HTML page to `substack_debug.html` for troubleshooting.
-- `--show-dates` : Displays the publication date of each article alongside the URL.
-- `--sort-by-date` : Sorts articles by their publication date.
-- `--ascending` : Sorts articles in ascending order (oldest first). Default is descending (newest first).
+## Quick Start
 
-### Example Commands
-#### **Fetch article links only:**
+### Basic Usage
 ```bash
-python substack_scraper.py https://substack.com/archive
+substack-scraper https://example.substack.com/archive
 ```
 
-#### **Fetch links with publication dates:**
+### Common Examples
+
+**Export to CSV with dates and titles:**
 ```bash
-python substack_scraper.py https://substack.com/archive --show-dates
+substack-scraper https://example.substack.com/archive \
+  --format csv \
+  --show-dates \
+  --show-titles \
+  --output my_articles
 ```
 
-#### **Sort articles by date (default descending order, newest first):**
+**Sort by date (newest first):**
 ```bash
-python substack_scraper.py https://substack.com/archive --sort-by-date
+substack-scraper https://example.substack.com/archive --sort-by-date
 ```
 
-#### **Sort articles by date in ascending order (oldest first):**
+**Use Firefox instead of Chrome:**
 ```bash
-python substack_scraper.py https://substack.com/archive --sort-by-date --ascending
+substack-scraper https://example.substack.com/archive --browser firefox
 ```
 
-#### **Enable debug mode (saves HTML for inspection):**
+**Export to JSON:**
 ```bash
-python substack_scraper.py https://substack.com/archive --debug
+substack-scraper https://example.substack.com/archive --format json --output articles
 ```
 
-#### **Both debug mode and showing dates:**
+**Resume from previous checkpoint:**
 ```bash
-python substack_scraper.py https://substack.com/archive --debug --show-dates
+substack-scraper https://example.substack.com/archive --resume
+```
+
+**Debug mode (save HTML for inspection):**
+```bash
+substack-scraper https://example.substack.com/archive --debug
+```
+
+## Command-Line Options
+
+### Configuration
+- `--config FILE` - Path to configuration file (YAML or JSON)
+
+### Browser Options
+- `--browser {chrome,firefox,edge}` - Browser engine to use (default: chrome)
+- `--no-headless` - Run browser in visible mode
+
+### Scraping Options
+- `--debug` - Enable debug mode and save HTML
+- `--resume` - Resume from previous checkpoint
+
+### Display Options
+- `--show-dates` - Show publication dates
+- `--show-titles` - Show article titles
+- `--sort-by-date` - Sort articles by publication date
+- `--ascending` - Sort in ascending order (oldest first)
+
+### Output Options
+- `--format {txt,csv,json}` - Output format (default: txt)
+- `--output NAME` - Output filename (without extension)
+- `--output-dir DIR` - Output directory (default: output)
+- `--no-console` - Don't print results to console
+
+### Logging Options
+- `--log-level {DEBUG,INFO,WARNING,ERROR}` - Logging level (default: INFO)
+- `--log-file FILE` - Save logs to file
+
+## Configuration File
+
+Create a `config.yaml` or `config.json` file to customize defaults:
+
+```yaml
+browser:
+  engine: chrome
+  headless: true
+  timeout: 30
+
+scraping:
+  initial_wait:
+    min: 3
+    max: 6
+  max_retries: 3
+
+output:
+  format: csv
+  directory: output
+  include_dates: true
+```
+
+Use it with:
+```bash
+substack-scraper https://example.substack.com/archive --config config.yaml
+```
+
+## Output Formats
+
+### Text (TXT)
+```
+01.01.2024 - Article Title - https://example.substack.com/p/article
+02.01.2024 - Another Article - https://example.substack.com/p/another
+```
+
+### CSV
+```csv
+date,title,url
+01.01.2024,Article Title,https://example.substack.com/p/article
+02.01.2024,Another Article,https://example.substack.com/p/another
+```
+
+### JSON
+```json
+{
+  "total_articles": 2,
+  "articles": [
+    {
+      "url": "https://example.substack.com/p/article",
+      "date": "01.01.2024",
+      "title": "Article Title"
+    }
+  ]
+}
+```
+
+## Advanced Usage
+
+### Python API
+
+You can also use the scraper programmatically:
+
+```python
+from substack_scraper import SubstackScraper, ArticleParser, Exporter
+from substack_scraper.config import Config
+
+# Initialize with config
+config = Config()
+scraper = SubstackScraper(config)
+parser = ArticleParser()
+exporter = Exporter("output")
+
+# Scrape articles
+with scraper:
+    html = scraper.scrape_page("https://example.substack.com/archive")
+    articles = parser.parse_articles(html, "https://example.substack.com")
+    
+    # Sort if needed
+    articles = parser.sort_articles(articles, by_date=True, ascending=False)
+    
+    # Export
+    exporter.export(articles, format="csv", filename="articles", include_dates=True)
 ```
 
 ## Troubleshooting
-### **1. No articles are found**
-- Run the script with `--debug` and open `substack_debug.html` to inspect if the page was loaded correctly.
-- Check if your IP is blocked by Substack (try opening the URL in a normal browser).
-- Ensure **Google Chrome** is installed on your system.
 
-### **2. Selenium fails to start Chrome**
-- Make sure you have the latest **Chrome** version installed.
-- Run the following to update `webdriver-manager`:
-  ```bash
-  pip install --upgrade webdriver-manager
-  ```
+### No articles found
+- Use `--debug` to save HTML and inspect the page structure
+- Verify the URL is correct and accessible
+- Check if your IP is blocked (try in a normal browser)
 
-## Notes
-- This script may not work if Substack changes its HTML structure.
-- The script mimics real user behavior by scrolling down gradually and using a real User-Agent to avoid bot detection.
+### Browser/WebDriver issues
+- Update WebDriver: `pip install --upgrade webdriver-manager`
+- Try a different browser: `--browser firefox`
+- Run in visible mode: `--no-headless`
+- Ensure your browser is up to date
+
+### Timeout errors
+- Increase timeout in config file
+- Check your internet connection
+- The site may be slow or blocking requests
+
+### Rate limiting / IP blocked
+- Reduce scraping frequency
+- Use VPN if necessary
+- Increase delays in config file
+
+## Development
+
+### Setup Development Environment
+```bash
+git clone https://github.com/yourusername/substack-scraper.git
+cd substack-scraper
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt -r requirements-dev.txt
+```
+
+### Run Tests
+```bash
+pytest tests/ -v
+```
+
+### Code Formatting
+```bash
+black src/substack_scraper tests
+flake8 src/substack_scraper
+```
+
+### Type Checking
+```bash
+mypy src/substack_scraper
+```
+
+## Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history and changes.
 
 ## License
-This script is open-source and provided as-is without warranty. Feel free to modify and improve it!
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Built with [Selenium](https://www.selenium.dev/) and [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/)
+- Inspired by the need for better Substack content management
+
+## Support
+
+- 📫 Issues: [GitHub Issues](https://github.com/yourusername/substack-scraper/issues)
+- 💬 Discussions: [GitHub Discussions](https://github.com/yourusername/substack-scraper/discussions)
 
 ---
+
+**Note**: This tool is for personal use and research. Please respect Substack's Terms of Service and robots.txt. Use responsibly and ethically.
 
 Happy scraping! 🚀

@@ -1,0 +1,70 @@
+# Default configuration for Substack Scraper
+
+browser:
+  # Browser engine: chrome, firefox, or edge
+  engine: chrome
+  
+  # Run browser in headless mode (without GUI)
+  headless: true
+  
+  # User agent string (updated to modern Chrome)
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  
+  # Timeout for browser operations (seconds)
+  timeout: 30
+  
+  # Page load timeout (seconds)
+  page_load_timeout: 60
+
+scraping:
+  # Initial wait after page load (seconds)
+  initial_wait:
+    min: 3
+    max: 6
+  
+  # Wait time between scrolls (seconds)
+  scroll_wait:
+    min: 2
+    max: 5
+  
+  # Delay between requests to avoid rate limiting (seconds)
+  rate_limit_delay: 1.0
+  
+  # Maximum number of retry attempts
+  max_retries: 3
+  
+  # Delay between retries (seconds)
+  retry_delay: 5
+
+output:
+  # Default output format: txt, csv, or json
+  format: txt
+  
+  # Output directory
+  directory: output
+  
+  # Include publication dates in output
+  include_dates: false
+  
+  # Sort articles by date
+  sort_by_date: false
+  
+  # Sort order: false for descending (newest first), true for ascending (oldest first)
+  ascending: false
+
+checkpoint:
+  # Enable checkpoint/resume functionality
+  enabled: true
+  
+  # Checkpoint file path
+  file: .checkpoint.json
+
+logging:
+  # Logging level: DEBUG, INFO, WARNING, ERROR
+  level: INFO
+  
+  # Log format
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+  # Optional log file path (null for no file logging)
+  file: null
